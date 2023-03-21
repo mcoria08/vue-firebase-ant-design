@@ -26,7 +26,7 @@ This is a solution to test AntDesign UI. Includes the `unplugin-vue-components` 
 ### Links
 
 - [Solution URL](https://github.com/mcoria08/vue-firebase-ant-design)
-- [Live Site URL](hhttps://peppy-sunshine-42dfa9.netlify.app/login)
+- [Live Site URL](https://peppy-sunshine-42dfa9.netlify.app/login)
 
 ## My process
 
