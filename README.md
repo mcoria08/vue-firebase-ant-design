@@ -25,8 +25,8 @@ This is a solution to test AntDesign UI. Includes the `unplugin-vue-components` 
 
 ### Links
 
-- [Solution URL](https://github.com/mcoria08/frntendmentor-qr-code-component-figma)
-- [Live Site URL](https://courageous-gnome-14a090.netlify.app/)
+- [Solution URL](https://github.com/mcoria08/vue-firebase-ant-design)
+- [Live Site URL](hhttps://peppy-sunshine-42dfa9.netlify.app/login)
 
 ## My process
 
