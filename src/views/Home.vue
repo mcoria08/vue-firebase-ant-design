@@ -19,16 +19,30 @@
     return respuesta.error(respuesta);
 
   }
-
   const cancel = () => {
     message.success('No se eliminó');
+  }
+
+  const copiarPortapapeles = async(id) => {
+    if (!navigator.clipboard){
+      return message.error("No se pudo copiar al portapapeles.");
+    }
+
+    const path = `${window.location.origin}/${id}`;
+
+    const respuesta = await navigator.clipboard.writeText(path);
+    if(respuesta){
+      message.error('Hubo un error!');
+    }else{
+      message.success('Se copió con éxito!');
+    }
   }
 
 </script>
 
 <template>
   <div>
-    <p><strong>Home - {{ userStore.userData?.email }}</strong></p>
+    <h2 class="mt-2">{{ userStore.userData?.email }}</h2>
 
     <!--
       Como se puede ver no se está haciendo la importación del componente
@@ -47,7 +61,9 @@
         :title="item.short"
       >
         <template #extra>
+
           <a-space>
+            <a-button @click="copiarPortapapeles(item.id)">Copiar</a-button>
             <a-popconfirm
               title="Eliminar?"
               ok-text="Sí"
@@ -73,5 +89,12 @@
 </template>
 
 
-<style lang="scss" scoped>
+
+<style scoped>
+  .mb-2{
+    margin-bottom: 2.1rem;
+  }
+  .mt-2{
+    margin-top: 1rem;
+  }
 </style>

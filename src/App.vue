@@ -17,7 +17,7 @@
 
 <template>
   <a-layout>
-    <a-layout-header class="header" v-if="!userStore.loadingSession">
+    <a-layout-header v-if="!userStore.loadingSession">
       <a-menu
             v-model:selectedKeys="selectedKeys"
             theme="dark"
@@ -26,6 +26,9 @@
           >
           <a-menu-item v-if="userStore.userData" key="home">
             <router-link to="/" >Home</router-link>
+          </a-menu-item>
+          <a-menu-item v-if="userStore.userData" key="perfil">
+            <router-link to="/perfil" >Perfil</router-link>
           </a-menu-item>
           <a-menu-item v-if="!userStore.userData" key="login">
             <router-link to="/login">Login</router-link>
@@ -39,12 +42,11 @@
       </a-menu>
     </a-layout-header>
 
-    <a-layout-content style="padding: 0 50px">
-      <a-layout-content :style="{ padding: '0 24px', minHeight: '280px' }">
-        <h1 style="padding: 20px 0 0 0">Firebase + Vite</h1>
+    <a-layout-content  style="padding: 0 50px">
+      <div class="container">
         <div v-if="userStore.loadingSession">Loading...</div>
-        <router-view></router-view>
-      </a-layout-content>
+        <router-view v-else></router-view>
+      </div>
     </a-layout-content>
 
     <a-layout-footer style="text-align: center">

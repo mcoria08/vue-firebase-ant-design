@@ -15,7 +15,6 @@
   });
 
   const onFinish = async (values) => {
-    console.log("Success:", values);
     const respuesta = await userStore.loginUser(formState.email, formState.password);
     if (!respuesta){
       return message.success('Bienvenido.');
@@ -62,12 +61,10 @@
 </script>
 
 <template>
+  <h2 class="mt-2">Ingresar</h2>
+
   <a-row>
-    <a-col
-            :xs="{ span: 24 }"
-            :sm="{ span: 18, offset: 3 }"
-            :lg="{ span: 12, offset: 6 }"
-        >
+
       <a-form
         name="basicLogin"
         autocomplete="off"
@@ -112,13 +109,19 @@
           </a-form-item>
 
       </a-form>
-    </a-col>
+
     <!-- <button @click="userStore.registerUser('Miguel')">Ingresar</button> -->
 
   </a-row>
 </template>
 
 
-<style lang="scss" scoped>
 
+<style scoped>
+  .mb-2{
+    margin-bottom: 2.1rem;
+  }
+  .mt-2{
+    margin-top: 1rem;
+  }
 </style>

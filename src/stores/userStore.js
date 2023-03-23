@@ -2,12 +2,15 @@ import { defineStore } from 'pinia';
 import { createUserWithEmailAndPassword,
          signInWithEmailAndPassword,
          signOut,
-         onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebaseConfig.js';
+         onAuthStateChanged,
+         updateProfile} from 'firebase/auth';
+import { db, auth, storage } from '../firebaseConfig.js';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import router from '../router';
 
 //Importando la otra tienda para acceder al objeto DOCUMENTS
 import { useDatabaseStore } from './databaseStore';
+import { doc, getDoc, setDoc } from 'firebase/firestore/lite';
 
 export const useUserStore = defineStore('userStore', {
 
@@ -32,14 +35,65 @@ export const useUserStore = defineStore('userStore', {
       }
     },
 
+
+    async updateUser(displayName, imagen){
+      this.loadingUser = true;
+      try {
+        if(imagen){
+          console.log(imagen);
+          const storageRef = ref(storage, `perfiles/${this.userData.uid}`);
+
+          //Uploading the image
+          await uploadBytes(storageRef, imagen.originFileObj);
+
+          //Getting the image URL
+          const photoURL = await getDownloadURL(storageRef);
+
+          //Updating the record of the user -
+          //OJO: ESTO ES EN EL STORE
+          await updateProfile(auth.currentUser, { photoURL });
+        }
+
+        await updateProfile(auth.currentUser, { displayName });
+        this.setUser(auth.currentUser);
+      } catch(error){
+        console.log(error);
+        return error.code;
+      }finally{
+        this.loadingUser = false;
+      }
+    },
+
+    async setUser(user){
+      //Para obtener la información del usuario
+      //Si no existe información previa del usuario se crea un registro
+      //Si ya existe un registor se actualiza entonces
+      try {
+        const docRef = doc(db, 'users', user.uid);
+
+        this.userData = {
+          email: user.email,
+          uid: user.uid,
+          displayName: user.displayName,
+          photoURL: user.photoURL
+        };
+
+        await setDoc(docRef, this.userData);
+
+      } catch(error) {
+        return error.code;
+      }finally{
+      }
+    },
+
     async loginUser(email, password){
       this.loadingUser = true;
       try {
         const { user } = await signInWithEmailAndPassword(auth, email, password);
-        this.userData = { email: user.email, uid: user.uid }
+        await this.setUser(user);
+
         router.push('/');
       } catch(error) {
-        console.log(error);
         return error.code;
       }finally{
         this.loadingUser = false;
@@ -54,7 +108,6 @@ export const useUserStore = defineStore('userStore', {
 
       try {
         await signOut(auth);
-        this.userData = null;
         router.push('/login');
       }catch(error){
         console.log(error);
@@ -63,9 +116,16 @@ export const useUserStore = defineStore('userStore', {
 
     currentUser(){
       return new Promise((resolve, reject) => {
-          const unsuscribe = onAuthStateChanged(auth, (user) => {
+          const unsuscribe = onAuthStateChanged(auth, async(user) => {
             if(user){
-              this.userData = { email: user.email, uid: user.uid };
+              console.log(user);
+              //await this.setUser(user);
+              this.userData = {
+                email: user.email,
+                uid: user.uid,
+                displayName: user.displayName,
+                photoURL: user.photoURL
+              };
             }else{
               this.userData = null;
               const databaseStore = useDatabaseStore();

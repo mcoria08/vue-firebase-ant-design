@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { db, auth } from '../firebaseConfig';
-import { addDoc, doc, deleteDoc, query, collection, where, getDoc, getDocs, updateDoc } from 'firebase/firestore/lite';
+import { setDoc, doc, deleteDoc, query, collection, where, getDoc, getDocs, updateDoc } from 'firebase/firestore/lite';
 import { getAuth } from "firebase/auth";
 import { nanoid } from 'nanoid'
 import router from '../router/index';
@@ -21,13 +21,11 @@ export const useDatabaseStore = defineStore('databaseStore', {
       }
       this.loadingDoc = true;
       try{
-        console.log(auth.currentUser);
         const q = query(collection(db, "urls"),
                     where("user", "==", auth.currentUser.uid)
                     );
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
-          console.log(doc.id, " => ", doc.data());
           this.documents.push({
             id: doc.id,
             ...doc.data()
@@ -49,9 +47,9 @@ export const useDatabaseStore = defineStore('databaseStore', {
           short: nanoid(6),
           user: auth.currentUser.uid
         };
-        const docRef = await addDoc(collection(db, 'urls'), objetoDoc);
+        await setDoc(doc(db, 'urls', objetoDoc.short), objetoDoc);
         this.documents.push({
-            id: docRef.id,
+            id: objetoDoc.short,
             ...objetoDoc
           });
       }catch(error){
@@ -68,17 +66,19 @@ export const useDatabaseStore = defineStore('databaseStore', {
           const docSnap = await getDoc(docRef);
 
           if(!docSnap.exists()){
-            throw new Error('No existe el documento');
+            //throw new Error('No existe el documento');
+            return false;
           }
 
-          if(docSnap.data().user !== auth.currentUser.uid){
+          /*if(docSnap.data().user !== auth.currentUser.uid){
             throw new Error('No puedes eliminar un documento que no te pertenece');
-          }
+          }*/
 
           return docSnap.data().name;
 
       }catch(error){
         console.log(error);
+        return false;
       }finally{
       }
     },
